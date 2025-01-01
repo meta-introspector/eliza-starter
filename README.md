@@ -1,4 +1,4 @@
-# Ollama Eliza
+# Ollama Eliza with opentelemetry and zipkin
 
 ## pnpm list
 
@@ -40,7 +40,12 @@ rm -rf node_modules/
 rm -rf dist/
 pnpm i && pnpm build && pnpm start
 pnpm rebuild
+
+docker run -d -p 9411:9411 openzipkin/zipkin
+
 pnpm start --characters="characters/eliza.character.json"
+
+
 ```
 
 
