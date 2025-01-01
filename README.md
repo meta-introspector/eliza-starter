@@ -1,5 +1,17 @@
 # Ollama Eliza
 
+My steps
+```
+nvm install --lts
+nvm use --lts
+rm -rf node_modules/
+rm -rf dist/
+pnpm i && pnpm build && pnpm start
+pnpm rebuild 
+pnpm start --characters="characters/eliza.character.json"
+```
+
+
 ## Edit the character files
 
 Open `agent/src/character.ts` to modify the default character. Uncomment and edit.
