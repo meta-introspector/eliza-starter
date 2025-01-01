@@ -1,4 +1,4 @@
-# Eliza
+# Ollama Eliza
 
 ## Edit the character files
 
@@ -7,7 +7,7 @@ Open `agent/src/character.ts` to modify the default character. Uncomment and edi
 ### Custom characters
 
 To load custom characters instead:
-- Use `pnpm start --characters="path/to/your/character.json"`
+- Use `pnpm start --characters="characters/eliza.character.json"`
 - Multiple character files can be loaded simultaneously
 
 ### Add clients
