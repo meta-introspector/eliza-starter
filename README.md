@@ -1,5 +1,37 @@
 # Ollama Eliza
 
+## pnpm list
+
+```
+Legend: production dependency, optional only, dev only
+
+@ai16z/agent@0.1.1 /mnt/data1/nix/time/2025/01/01/eliza-starter
+
+dependencies:
+@ai16z/adapter-postgres 0.1.4-alpha.3
+@ai16z/plugin-image-generation 0.1.4-alpha.3
+@ai16z/adapter-sqlite 0.1.4-alpha.3
+@ai16z/plugin-node 0.1.4-alpha.3
+@ai16z/client-auto 0.1.4-alpha.3
+@ai16z/plugin-solana 0.1.4-alpha.3
+@ai16z/client-direct 0.1.4-alpha.3
+@ai16z/plugin-starknet 0.1.4-alpha.3
+@ai16z/client-discord 0.1.4-alpha.3
+better-sqlite3 11.5.0
+@ai16z/client-telegram 0.1.4-alpha.3
+readline 1.3.0
+@ai16z/client-twitter 0.1.4-alpha.3
+ws 8.18.0
+@ai16z/eliza 0.1.4-alpha.3
+yargs 17.7.2
+@ai16z/plugin-bootstrap 0.1.4-alpha.3
+
+devDependencies:
+ts-node 10.9.2
+tsup 8.3.5
+typescript 5.6.3
+```
+
 My steps
 ```
 nvm install --lts
@@ -7,7 +39,7 @@ nvm use --lts
 rm -rf node_modules/
 rm -rf dist/
 pnpm i && pnpm build && pnpm start
-pnpm rebuild 
+pnpm rebuild
 pnpm start --characters="characters/eliza.character.json"
 ```
 
