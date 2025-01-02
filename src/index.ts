@@ -62,21 +62,6 @@ import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 const traceExporter_zipkin = new ZipkinExporter(options);
 // parts from https://stackoverflow.com/questions/71654897/opentelemetry-typescript-project-zipkin-exporter
 
-const sdk = new NodeSDK({
-    resource: new Resource({
-	[ATTR_SERVICE_NAME]: 'eliza-client',
-	[ATTR_SERVICE_VERSION]: '1.0',
-    }),
-    //traceExporter: new ConsoleSpanExporter(),
-    traceExporter: traceExporter_zipkin,
-    //metricReader: new PeriodicExportingMetricReader({
-    //exporter: traceExporter_zipkin //new ConsoleMetricExporter(),
-    //}),
-    instrumentations: [getNodeAutoInstrumentations()],
-    
-});
-
-sdk.start();
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -406,3 +391,20 @@ async function handleUserInput(input, agentId) {
     console.error("Error fetching response:", error);
   }
 }
+
+
+const sdk = new NodeSDK({
+    resource: new Resource({
+	[ATTR_SERVICE_NAME]: 'eliza-client',
+	[ATTR_SERVICE_VERSION]: '1.0',
+    }),
+    //traceExporter: new ConsoleSpanExporter(),
+    traceExporter: traceExporter_zipkin,
+    //metricReader: new PeriodicExportingMetricReader({
+    //exporter: traceExporter_zipkin //new ConsoleMetricExporter(),
+    //}),
+    instrumentations: [getNodeAutoInstrumentations()],
+    
+});
+
+sdk.start();
