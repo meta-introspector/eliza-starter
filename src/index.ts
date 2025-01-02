@@ -17,7 +17,9 @@ import yargs from "yargs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { character } from "./character.ts";
-import type { DirectClient } from "@ai16z/client-direct";
+
+import { DirectClient } from "@ai16z/client-direct";
+//import { DirectClient } from "@elizaos/client-direct";
 
 /*instrumentation.ts*/
 import { NodeSDK } from '@opentelemetry/sdk-node';
@@ -271,7 +273,9 @@ function intializeDbCache(character: Character, db: IDatabaseCacheAdapter) {
   return cache;
 }
 
-async function startAgent(character: Character, directClient: DirectClient) {
+async function startAgent(character: Character,
+			   directClient: DirectClient
+			 ) {
   try {
     character.id ??= stringToUuid(character.name);
     character.username ??= character.name;
@@ -294,7 +298,7 @@ async function startAgent(character: Character, directClient: DirectClient) {
 
     const clients = await initializeClients(character, runtime);
 
-    directClient.registerAgent(runtime);
+      directClient.registerAgent(runtime);
 
     return clients;
   } catch (error) {
@@ -308,7 +312,9 @@ async function startAgent(character: Character, directClient: DirectClient) {
 }
 
 const startAgents = async () => {
-  const directClient = await DirectClientInterface.start();
+    const directClient = new DirectClient();
+    //directClient.start(3000);
+    //const directClient = 1;//await DirectClientInterface.start();
   const args = parseArguments();
 
   let charactersArg = args.characters || args.character;
@@ -321,7 +327,9 @@ const startAgents = async () => {
   console.log("characters", characters);
   try {
     for (const character of characters) {
-      await startAgent(character, directClient as DirectClient);
+	await startAgent(character
+			 , directClient as DirectClient
+			);
     }
   } catch (error) {
     elizaLogger.error("Error starting agents:", error);
