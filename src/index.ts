@@ -17,15 +17,23 @@ import yargs from "yargs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { character } from "./character.ts";
+import { Resource } from '@opentelemetry/resources';
+import {
+  ATTR_SERVICE_NAME,
+  ATTR_SERVICE_VERSION,
+} from '@opentelemetry/semantic-conventions';
+
 
 import { DirectClient } from "@ai16z/client-direct";
 //import { DirectClient } from "@elizaos/client-direct";
 
 /*instrumentation.ts*/
 import { NodeSDK } from '@opentelemetry/sdk-node';
-import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace-node';
+//import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
-import {  PeriodicExportingMetricReader,  ConsoleMetricExporter,} from '@opentelemetry/sdk-metrics';
+import {  PeriodicExportingMetricReader,
+	  //ConsoleMetricExporter,
+       } from '@opentelemetry/sdk-metrics';
 
 import * as opentelemetry from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
@@ -39,15 +47,15 @@ import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 
   const options = {
     headers: {
-      'my-header': 'header-value',
+      'client': 'yes',
     },
     url: zipkinURL,
-    //serviceName: 'your-application-name',   
+      serviceName: 'eliza-client',   
    
     // optional interceptor
     getExportRequestHeaders: () => {
       return {
-        'my-header': 'header-value',
+        'client-name': 'eliza',
       }
     }
   }
@@ -55,12 +63,17 @@ const traceExporter_zipkin = new ZipkinExporter(options);
 // parts from https://stackoverflow.com/questions/71654897/opentelemetry-typescript-project-zipkin-exporter
 
 const sdk = new NodeSDK({
+    resource: new Resource({
+	[ATTR_SERVICE_NAME]: 'eliza-client',
+	[ATTR_SERVICE_VERSION]: '1.0',
+    }),
     //traceExporter: new ConsoleSpanExporter(),
     traceExporter: traceExporter_zipkin,
-    metricReader: new PeriodicExportingMetricReader({
-	exporter: new ConsoleMetricExporter(),
-    }),
+    //metricReader: new PeriodicExportingMetricReader({
+    //exporter: traceExporter_zipkin //new ConsoleMetricExporter(),
+    //}),
     instrumentations: [getNodeAutoInstrumentations()],
+    
 });
 
 sdk.start();
