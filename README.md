@@ -1,5 +1,7 @@
 # Ollama Eliza with opentelemetry and zipkin
 
+make sure your character  file matches the server!
+
 ## pnpm list
 
 ```
@@ -8,7 +10,7 @@ Legend: production dependency, optional only, dev only
 @ai16z/agent@0.1.1 /mnt/data1/nix/time/2025/01/01/eliza-starter
 
 dependencies:
-@ai16z/adapter-postgres 0.1.4-alpha.3
+	h@ai16z/adapter-postgres 0.1.4-alpha.3
 @ai16z/plugin-image-generation 0.1.4-alpha.3
 @ai16z/adapter-sqlite 0.1.4-alpha.3
 @ai16z/plugin-node 0.1.4-alpha.3
@@ -43,7 +45,7 @@ pnpm rebuild
 
 docker run -d -p 9411:9411 openzipkin/zipkin
 
-pnpm start --characters="characters/eliza.character.json"
+pnpm start 
 
 
 ```
@@ -56,7 +58,8 @@ Open `agent/src/character.ts` to modify the default character. Uncomment and edi
 ### Custom characters
 
 To load custom characters instead:
-- Use `pnpm start --characters="characters/eliza.character.json"`
+- Use `pnpm start ` 
+note --characters="characters/eliza.character.json" is hard coded in package.json
 - Multiple character files can be loaded simultaneously
 
 ### Add clients
