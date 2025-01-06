@@ -371,9 +371,11 @@ async function handleUserInput(input, agentId) {
 
   try {
     const serverPort = parseInt(settings.SERVER_PORT || "3000");
-
+    const serverName = settings.SERVER_NAME || "localhost";
+    const url = `http://${serverName}:${serverPort}/${agentId}/message`;
+    console.log(url)
     const response = await fetch(
-      `http://localhost:${serverPort}/${agentId}/message`,
+      url,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
