@@ -1,6 +1,6 @@
 {
   "name": "TINE-IntrospectorIsNotEliza",
-  "plugins": [],
+    "plugins": [	       ],
   "clients": [],
   "modelProvider": "ollama",
   "settings": {
