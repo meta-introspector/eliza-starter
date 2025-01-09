@@ -45,7 +45,7 @@ pnpm rebuild
 
 docker run -d -p 9411:9411 openzipkin/zipkin
 
-pnpm start 
+pnpm start --characters=characters/eliza.character.json
 
 
 ```
