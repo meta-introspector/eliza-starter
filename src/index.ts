@@ -5,23 +5,8 @@ import { DiscordClientInterface } from "@ai16z/client-discord";
 import { AutoClientInterface } from "@ai16z/client-auto";
 import { TelegramClientInterface } from "@ai16z/client-telegram";
 import { TwitterClientInterface } from "@ai16z/client-twitter";
-import {
-  DbCacheAdapter,
-  defaultCharacter,
-  FsCacheAdapter,
-  ICacheManager,
-  IDatabaseCacheAdapter,
-  stringToUuid,
-  AgentRuntime,
-  CacheManager,
-  Character,
-  IAgentRuntime,
-  ModelProviderName,
-  elizaLogger,
-  settings,
-  IDatabaseAdapter,
-  validateCharacterConfig,
-} from "@ai16z/eliza";
+import {  DbCacheAdapter,  defaultCharacter,  FsCacheAdapter,  ICacheManager,  IDatabaseCacheAdapter,  stringToUuid,
+  AgentRuntime,  CacheManager,  Character,  IAgentRuntime,  ModelProviderName,  elizaLogger,  settings,  IDatabaseAdapter,  validateCharacterConfig,} from "@ai16z/eliza";
 import { bootstrapPlugin } from "@ai16z/plugin-bootstrap";
 import { solanaPlugin } from "@ai16z/plugin-solana";
 import { nodePlugin } from "@ai16z/plugin-node";
@@ -32,7 +17,51 @@ import yargs from "yargs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { character } from "./character.ts";
-import type { DirectClient } from "@ai16z/client-direct";
+import { Resource } from '@opentelemetry/resources';
+import {
+  ATTR_SERVICE_NAME,
+  ATTR_SERVICE_VERSION,
+} from '@opentelemetry/semantic-conventions';
+
+
+import { DirectClient } from "@ai16z/client-direct";
+//import { DirectClient } from "@elizaos/client-direct";
+
+/*instrumentation.ts*/
+import { NodeSDK } from '@opentelemetry/sdk-node';
+//import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace-node';
+import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
+import {  PeriodicExportingMetricReader,
+	  //ConsoleMetricExporter,
+       } from '@opentelemetry/sdk-metrics';
+
+import * as opentelemetry from '@opentelemetry/api';
+import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
+
+  //Specify zipkin url. defualt url is http://localhost:9411/api/v2/spans
+  const zipkinUrl = 'http://localhost';
+  const zipkinPort = '9411';
+  const zipkinPath = '/api/v2/spans';
+  const zipkinURL = `${zipkinUrl}:${zipkinPort}${zipkinPath}`;
+
+  const options = {
+    headers: {
+      'client': 'yes',
+    },
+    url: zipkinURL,
+      serviceName: 'eliza-client',   
+   
+    // optional interceptor
+    getExportRequestHeaders: () => {
+      return {
+        'client-name': 'eliza',
+      }
+    }
+  }
+const traceExporter_zipkin = new ZipkinExporter(options);
+// parts from https://stackoverflow.com/questions/71654897/opentelemetry-typescript-project-zipkin-exporter
+
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -242,7 +271,9 @@ function intializeDbCache(character: Character, db: IDatabaseCacheAdapter) {
   return cache;
 }
 
-async function startAgent(character: Character, directClient: DirectClient) {
+async function startAgent(character: Character,
+			   directClient: DirectClient
+			 ) {
   try {
     character.id ??= stringToUuid(character.name);
     character.username ??= character.name;
@@ -265,7 +296,7 @@ async function startAgent(character: Character, directClient: DirectClient) {
 
     const clients = await initializeClients(character, runtime);
 
-    directClient.registerAgent(runtime);
+      directClient.registerAgent(runtime);
 
     return clients;
   } catch (error) {
@@ -279,7 +310,9 @@ async function startAgent(character: Character, directClient: DirectClient) {
 }
 
 const startAgents = async () => {
-  const directClient = await DirectClientInterface.start();
+    const directClient = new DirectClient();
+    //directClient.start(3000);
+    //const directClient = 1;//await DirectClientInterface.start();
   const args = parseArguments();
 
   let charactersArg = args.characters || args.character;
@@ -292,7 +325,9 @@ const startAgents = async () => {
   console.log("characters", characters);
   try {
     for (const character of characters) {
-      await startAgent(character, directClient as DirectClient);
+	await startAgent(character
+			 , directClient as DirectClient
+			);
     }
   } catch (error) {
     elizaLogger.error("Error starting agents:", error);
@@ -336,9 +371,11 @@ async function handleUserInput(input, agentId) {
 
   try {
     const serverPort = parseInt(settings.SERVER_PORT || "3000");
-
+    const serverName = settings.SERVER_NAME || "localhost";
+    const url = `http://${serverName}:${serverPort}/${agentId}/message`;
+    console.log(url)
     const response = await fetch(
-      `http://localhost:${serverPort}/${agentId}/message`,
+      url,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -356,3 +393,20 @@ async function handleUserInput(input, agentId) {
     console.error("Error fetching response:", error);
   }
 }
+
+
+const sdk = new NodeSDK({
+    resource: new Resource({
+	[ATTR_SERVICE_NAME]: 'eliza-client',
+	[ATTR_SERVICE_VERSION]: '1.0',
+    }),
+    //traceExporter: new ConsoleSpanExporter(),
+    traceExporter: traceExporter_zipkin,
+    //metricReader: new PeriodicExportingMetricReader({
+    //exporter: traceExporter_zipkin //new ConsoleMetricExporter(),
+    //}),
+    instrumentations: [getNodeAutoInstrumentations()],
+    
+});
+
+sdk.start();
