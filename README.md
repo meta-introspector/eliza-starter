@@ -1,5 +1,8 @@
 # Ollama Eliza with opentelemetry and zipkin
 
+set the env variable server name
+`export SERVER_NAME=1.2.3.4`
+	
 make sure your character  file matches the server!
 
 ## pnpm list
