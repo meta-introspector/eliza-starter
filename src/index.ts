@@ -40,7 +40,7 @@ import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 
   //Specify zipkin url. defualt url is http://localhost:9411/api/v2/spans
-  const zipkinUrl = 'http://localhost';
+  const zipkinUrl = 'http://localhost'; # 
   const zipkinPort = '9411';
   const zipkinPath = '/api/v2/spans';
   const zipkinURL = `${zipkinUrl}:${zipkinPort}${zipkinPath}`;
